@@ -8,11 +8,28 @@ namespace {
 
 class FunctionInfoPass final : public PassInfoMixin<FunctionInfoPass> {
 public:
-  PreservedAnalyses run([[maybe_unused]] Module &M, ModuleAnalysisManager &) {
-    outs() << "CSCD70 Function Information Pass"
-           << "\n";
-
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
+    
     /// @todo(CSCD70) Please complete this method.
+    for (auto& F : M) {
+      if (F.isIntrinsic() || !F.hasUWTable())  continue;
+      outs() << "Function Name: " << F.getName() << "\n";
+
+      if (F.isVarArg()) {
+        outs() << "Number of Arguments: " << F.arg_size() << "+*" << "\n";
+      } else {
+        outs() << "Number of Arguments: " << F.arg_size() << "\n";
+      }
+      outs() << "Number of Calls: " << F.getNumUses() << "\n";
+
+      int BB_size = 0;
+      for (auto& BB : F) {
+        BB_size++;
+      }
+      outs() << "Number of BBs: " << BB_size << "\n";
+
+      outs() << "Number of Instructions: " << F.getInstructionCount() << "\n";
+    }
 
     return PreservedAnalyses::all();
   }

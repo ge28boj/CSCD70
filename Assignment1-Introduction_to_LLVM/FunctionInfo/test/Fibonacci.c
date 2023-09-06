@@ -1,7 +1,7 @@
 // clang-format off
 // RUN: clang -O2 -S -emit-llvm -c %s -o %basename_t.ll
 // RUN: opt -load-pass-plugin=%dylibdir/libFunctionInfo.so -passes=function-info -disable-output %basename_t.ll 2>&1 | \
-// RUN: FileCheck --match-full-lines --check-prefix=SAMPLE %s
+// RUN: FileCheck --match-full-lines %s
 // clang-format on
 /// @todo(CSCD70) Please Remove the `--check-prefix=SAMPLE` option and add the
 ///               CHECK directives similar to those in Loop.c.
@@ -9,6 +9,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+
+// CHECK-LABEL: Function Name: printf
+// CHECK-NEXT: Number of Arguments: 1+*
+// CHECK-NEXT: Number of Calls: 2
+// CHECK-NEXT: Number of BBs: 1
+// CHECK-NEXT: Number of Instructions: 8
 int printf(const char *format, ...) {
   int ret;
   va_list args;
@@ -19,6 +25,11 @@ int printf(const char *format, ...) {
   return ret;
 }
 
+// CHECK-LABEL: Function Name: Fibonacci
+// CHECK-NEXT: Number of Arguments: 1
+// CHECK-NEXT: Number of Calls: 1
+// CHECK-NEXT: Number of BBs: 5
+// CHECK-NEXT: Number of Instructions: 15
 int Fibonacci(const int n) {
   if (n == 0) {
     printf("f(0) = 0");
